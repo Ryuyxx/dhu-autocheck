@@ -4,7 +4,6 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from time import sleep
-from getpass import getpass
 import random
 import re
 from Notify import LINENotifyBot
@@ -22,8 +21,8 @@ users = [
 myself = "amHdHYRhdd9aqJImvTI2jhSlI0lciHHoEqbZnIoYSO0" #dhw
 bot = LINENotifyBot(access_token=myself)
 
-driver = webdriver.Chrome("C:/code/chromedriver")
-url1 = 'https://portal.dhw.ac.jp/uprx/up/pk/pky001/Pky00101.xhtml'
+driver = webdriver.Chrome("chromedriver.exe")
+url = 'https://portal.dhw.ac.jp/uprx/up/pk/pky001/Pky00101.xhtml'
 driver.implicitly_wait(3)  # 3-5
 wait = WebDriverWait(driver, 3)
 
@@ -31,7 +30,7 @@ MESSAGE = ''
 
 def login(username,password):
     global MESSAGE
-    driver.get(url1)
+    driver.get(url)
     # driver.maximize_window()
 
     webElement = 'loginForm:userId'
@@ -239,6 +238,7 @@ def send_to_line():
         message=MESSAGE
         )
     MESSAGE = ''
+
 if __name__ == '__main__':
     for user in users:
         login(user["USERNAME"],user["PASSWORD"])
