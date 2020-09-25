@@ -229,7 +229,7 @@ def check_hw():
 
     back_home()
     if any_notice == 0:
-        MESSAGE = '\n授業関連でのお知らせはありません\n'
+        MESSAGE += '\n授業関連でのお知らせはありません\n'
 
 def fin_action():
     global MESSAGE
