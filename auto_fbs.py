@@ -9,14 +9,10 @@ import random
 import re
 from Notify import LINENotifyBot
 
-# USERNAME = "A19DC154"
-# PASSWORD = "Ryuya1045_"
-# USERNAME = "A19DC558"
-# PASSWORD = "93041419"
-
 users = [
     {"USERNAME": "A19DC154", "PASSWORD": "Ryuya1045_"},
     {"USERNAME": "A19DC558", "PASSWORD": "93041419"},
+    {"USERNAME": "A19DC132", "PASSWORD": "ameneko0422"},
 ]
 
 myself = "amHdHYRhdd9aqJImvTI2jhSlI0lciHHoEqbZnIoYSO0"  # dhw
@@ -24,13 +20,30 @@ bot = LINENotifyBot(access_token=myself)
 
 options = Options()
 options.add_argument('--headless')
-driver = webdriver.Chrome(options=options)
+# driver = webdriver.Chrome(options=options)
+driver = webdriver.Chrome()
 url = 'https://portal.dhw.ac.jp/uprx/up/pk/pky001/Pky00101.xhtml'
 driver.implicitly_wait(3)  # 3-5
 wait = WebDriverWait(driver, 3)
 
 MESSAGE = ''
 
+
+def java_click_byclassname2(id1,id2):
+    # wait.until(expected_conditions.visibility_of_element_located((By.CLASS_NAME, id1)))
+    element = driver.find_element_by_class_name(id1).find_element_by_class_name(id2)
+    driver.execute_script("arguments[0].click();", element)
+    sleep(0.5)
+
+def fbsubmit():
+    global MESSAGE
+    fb_title = driver.find_element_by_class_name('enqHeaderTitle').text  # fb授業名 [NON CHANGED]
+    driver.find_element_by_class_name('btnAltColor').click()  # 回答ボタン [TEST]
+    java_click_byclassname2('dlgCaution','ui-button-text-icon-left') #ok1 [TEST]
+    java_click_byclassname2('dlgWarning','ui-button-text-icon-left') #ok2 [TEST]
+    wait.until(expected_conditions.visibility_of_element_located((By.ID, 'functionHeaderForm:breadCrumb')))  # アンケート回答一覧バー [TEST]
+    print("Submit")
+    MESSAGE += "\n・{} を提出しました\n".format(fb_title)
 
 def login(username, password):
     global MESSAGE
@@ -51,7 +64,7 @@ def login(username, password):
     sleep(1)
     login_user = driver.find_element_by_class_name('loginInfo').text
     print(login_user[:login_user.find('ん') + 1] + " 自動処理実行します。")
-    MESSAGE += login_user[:login_user.find('ん') + 1]
+    MESSAGE += login_user[:login_user.find('ん') + 1] + '\n'
 
 
 def back_home():
@@ -63,18 +76,18 @@ def back_home():
 
 def answer_fb():
     global MESSAGE
-
-    wait.until(expected_conditions.visibility_of_element_located((By.ID, 'headerForm:j_idt67')))  # ID:top img
+    MESSAGE += '\n\n---  Feedback Sheet  ----------\n'
+    wait.until(expected_conditions.visibility_of_element_located((By.ID, 'headerForm:j_idt67')))  # ID:top img [NON CHANGED]
     webElement = driver.find_element_by_xpath(
-        '//*[@id="menuForm:mainMenu"]/ul/li[5]/ul/table/tbody/tr/td[3]/ul/li[2]/a')  # お知らせ―>アンケート回答ボタン
+        '//*[@id="menuForm:mainMenu"]/ul/li[5]/ul/table/tbody/tr/td[3]/ul/li[2]/a')  # お知らせ―>アンケート回答ボタン [NON CHANGED]
     driver.execute_script("arguments[0].click();", webElement)
     sleep(1)
 
-    wait.until(expected_conditions.visibility_of_element_located((By.ID, 'funcForm:j_idt570')))  # 回答対象アンケートからの全体範囲
+    wait.until(expected_conditions.visibility_of_element_located((By.ID, 'functionHeaderForm:breadCrumb')))  # アンケート回答一覧バー [TEST]
     sleep(0.5)
-    if driver.find_element_by_id('funcForm:j_idt575:j_idt578:0:j_idt579_header'):  # フィードバックシートの黒いバー
-        get_remaining_fb = len(driver.find_elements_by_class_name('ui-panelgrid-even'))  # check later when its mulitple
-        if len(driver.find_elements_by_class_name('ctgrHeaderGrid')) == 2:
+    if driver.find_element_by_class_name('ctgrHeaderGrid'):  # フィードバックシートの横バー [NON CHANGED]
+        get_remaining_fb = len(driver.find_elements_by_class_name('ui-panelgrid-even'))  # check len of fbs [NON CHANGED]
+        if len(driver.find_elements_by_class_name('ctgrHeaderGrid')) > 1:  # フィードバックシートの横バー [NON CHANGED]
             get_remaining_fb -= 1
 
         print("\nDetected {} Feedback-Sheet\n".format(get_remaining_fb))
@@ -86,80 +99,60 @@ def answer_fb():
         ]
         for i in range(get_remaining_fb):
 
-            fbs = driver.find_element_by_id(
-                'funcForm:j_idt575:j_idt578:{}:j_idt580'.format(fbs_list_num))  # 一番上にあるフィードバックシート
+            fbss = driver.find_elements_by_class_name('enqName')  # フィードバックシートリスト取得 [NON CHANGED]
 
-            get_fin_or_yet = driver.find_element_by_xpath(
-                '//*[@id="funcForm:j_idt575:j_idt578:0:j_idt580"]/tbody/tr/td[3]'.format(
-                    fbs_list_num)).text  # 一番上にあるフィードバックシートの回答済みか
-            if get_fin_or_yet == '回答済':
-                print("All answered")
-                MESSAGE += "\nFb全回答済\n"
+            fin_or_yets = driver.find_elements_by_class_name('sign')[fbs_list_num].text # 一番上にあるフィードバックシートの回答済みか [NON CHANGED]
+            if fin_or_yets == '回答済':
+                text = "All answered"
+                msg_text = "\nフィードバックシートはすべて回答されています😉\n"
+                if fbs_list_num != 0:
+                    text = "Remaining {} Feedback Sheet".format(fbs_list_num)
+                    msg_text = "\n{}個フィードバックシートが残っています🙁\n".format(fbs_list_num)
+                print(text)
+                MESSAGE += msg_text
                 break
 
-            driver.execute_script("arguments[0].click();", fbs)
-            wait.until(expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'enqHeaderTitle')))
+            fbss[fbs_list_num].click()
+            wait.until(expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'enqHeaderTitle'))) #fb授業名表示されるまで [NON CHANGED]
 
             try:
-                driver.find_element_by_xpath('//*[@id="funcForm:enqQuestList:0:j_idt675"]/tbody/tr[1]/td[1]/div')  # ボタン
-                driver.find_element_by_xpath('//*[@id="funcForm:enqQuestList:2:j_idt675"]/tbody/tr[2]/td[1]/div')
-                driver.find_element_by_xpath('//*[@id="funcForm:enqQuestList:3:j_idt675"]/tbody/tr[1]/td[1]/div')
-            except:
-                fb_title = driver.find_element_by_xpath(
-                    '//*[@id="funcForm:j_idt645"]/div/div[1]/table[1]/tbody/tr/td/span').text  # fbシートのタイトル
-                if fb_title in subjects:
-                    driver.find_element_by_name('funcForm:j_idt706').click()  # submit_btn
-                    wait.until(
-                        expected_conditions.visibility_of_element_located((By.NAME, 'funcForm:j_idt711:j_idt712')))
-                    ok1_btn = driver.find_element_by_name('funcForm:j_idt711:j_idt712')  # ok1
-                    driver.execute_script("arguments[0].click();", ok1_btn)
-                    wait.until(
-                        expected_conditions.visibility_of_element_located((By.NAME, 'funcForm:j_idt716:j_idt717')))
-                    ok2_btn = driver.find_element_by_name('funcForm:j_idt716:j_idt717')  # ok2
-                    driver.execute_script("arguments[0].click();", ok2_btn)
+                q1 = driver.find_elements_by_class_name('ui-selectoneradio')[0] #ボタン選択式エリアがあるか [TEST]
+                q3 = driver.find_elements_by_class_name('ui-selectoneradio')[1] #ボタン選択式エリアがあるか [TEST]
+                q4 = driver.find_elements_by_class_name('ui-selectoneradio')[2] #ボタン選択式エリアがあるか [TEST]
 
-                    wait.until(expected_conditions.visibility_of_element_located(
-                        (By.ID, 'funcForm:j_idt570')))  # 全体範囲
+            except:
+                fb_title = driver.find_element_by_class_name('enqHeaderTitle').text  # fb授業名 [NON CHANGED]
+                if fb_title in subjects:
+                    fbsubmit()
                     continue
                 else:
                     print("{}\n上記授業は通常フォーマットに該当しません スキップします\n".format(fb_title))
+                    MESSAGE += "\n・{}はスキップされます\n".format(fb_title)
                     fbs_list_num += 1
                     driver.find_element_by_xpath(
-                        '//*[@id="functionHeaderForm:breadCrumb"]/ul/li[1]/a').click()  # 左上アンケート回答一覧リンク
+                        '//*[@id="functionHeaderForm:breadCrumb"]/ul/li[1]/a').click()  # 左上アンケート回答一覧リンク [NON CHANGED]
                     continue
 
-            driver.find_element_by_xpath(
-                '//*[@id="funcForm:enqQuestList:0:j_idt675"]/tbody/tr[1]/td[1]/div').click()  # 理解できた
-            driver.find_element_by_xpath(
-                '//*[@id="funcForm:enqQuestList:2:j_idt675"]/tbody/tr[2]/td[1]/div').click()  # 適切だった
+            q1.find_elements_by_class_name('ui-radiobutton')[0].click() # q1理解できた
+            q3.find_elements_by_class_name('ui-radiobutton')[1].click() # q2理解できた
+            random_select_num = random.randrange(0, 5, 2)
+            q4.find_elements_by_class_name('ui-radiobutton')[random_select_num].click() # q4 ランダム選択
 
-            random_select_num = random.randrange(1, 6, 2)
-            driver.find_element_by_xpath(
-                '//*[@id="funcForm:enqQuestList:3:j_idt675"]/tbody/tr[{}]/td[1]/div'.format(random_select_num)).click()
-            # print("今回は{}番目の選択を選びました。".format(random_select_num))
+            fbsubmit()
+            if get_remaining_fb == 1:
+                print("All answered")
+                MESSAGE += "\nフィードバックシートはすべて回答されています😉\n"
 
-            driver.find_element_by_name('funcForm:j_idt706').click()  # submit_btn
-            wait.until(expected_conditions.visibility_of_element_located((By.NAME, 'funcForm:j_idt711:j_idt712')))
-            ok1_btn = driver.find_element_by_name('funcForm:j_idt711:j_idt712')  # ok1
-            driver.execute_script("arguments[0].click();", ok1_btn)
-            wait.until(expected_conditions.visibility_of_element_located((By.NAME, 'funcForm:j_idt716:j_idt717')))
-            ok2_btn = driver.find_element_by_name('funcForm:j_idt716:j_idt717')  # ok2
-            driver.execute_script("arguments[0].click();", ok2_btn)
-
-            wait.until(
-                expected_conditions.visibility_of_element_located((By.ID, 'funcForm:j_idt570')))  # 全体範囲
-
-            print("Submit")
-            MESSAGE += "Submit\n"
     else:
-        print("\n---- FB not existing ----\n")
-        MESSAGE += "\n---- FB not existing ----\n"
+        print("\n----  No Feedback Sheet  ----\n")
+        MESSAGE += "\n----  No Feedback Sheet  ----\n"
 
     back_home()
 
 
 def check_hw():
     global MESSAGE
+    MESSAGE += '\n\n---  Class Stuff  ----------\n'
 
     wait.until(expected_conditions.element_to_be_clickable(
         (By.ID, 'funcForm:j_idt361:j_idt2402:0:j_idt2481')))  # 一番上のクラスのクラスプロファイル
@@ -195,7 +188,7 @@ def check_hw():
                     print("・{}が終了していません".format(content_name))
                     print("・{}".format(remain_hw))
                     MESSAGE += "・{}が終了していません\n".format(content_name)
-                    MESSAGE += "・[{}]\n".format(remain_hw)
+                    MESSAGE += "・[{}]\n\n".format(remain_hw)
                     if content_name != '課題提出':
                         continue
                     content.click()
@@ -208,7 +201,7 @@ def check_hw():
                             '//*[@id="funcForm:gakKdiTstList_data"]/tr[{}]/td[6]/span'.format(
                                 hw_num + 1)).text  # 課題提出終了日時
                         print('{}が{}までです'.format(hw_name, hw_deadline))
-                        MESSAGE += '・{}が{}までです\n'.format(hw_name, hw_deadline)
+                        MESSAGE += '・{}が{}までです\n\n'.format(hw_name, hw_deadline)
                     driver.find_element_by_id('functionHeaderForm:j_idt148').click()  # 左上のTOPボタン
 
             except:
