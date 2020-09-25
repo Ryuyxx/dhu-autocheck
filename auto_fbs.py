@@ -20,8 +20,7 @@ bot = LINENotifyBot(access_token=myself)
 
 options = Options()
 options.add_argument('--headless')
-# driver = webdriver.Chrome(options=options)
-driver = webdriver.Chrome()
+driver = webdriver.Chrome(options=options)
 url = 'https://portal.dhw.ac.jp/uprx/up/pk/pky001/Pky00101.xhtml'
 driver.implicitly_wait(3)  # 3-5
 wait = WebDriverWait(driver, 3)
