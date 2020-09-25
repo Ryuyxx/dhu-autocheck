@@ -20,7 +20,8 @@ bot = LINENotifyBot(access_token=myself)
 
 options = Options()
 options.add_argument('--headless')
-driver = webdriver.Chrome(options=options)
+# driver = webdriver.Chrome(options=options)
+driver = webdriver.Chrome()
 url = 'https://portal.dhw.ac.jp/uprx/up/pk/pky001/Pky00101.xhtml'
 driver.implicitly_wait(3)  # 3-5
 wait = WebDriverWait(driver, 3)
@@ -75,7 +76,7 @@ def back_home():
 
 def answer_fb():
     global MESSAGE
-    MESSAGE += '\n\n---  Feedback Sheet  ----------\n'
+    MESSAGE += '\n\n《フィードバックシート》\n'
     wait.until(expected_conditions.visibility_of_element_located((By.ID, 'headerForm:j_idt67')))  # ID:top img [NON CHANGED]
     webElement = driver.find_element_by_xpath(
         '//*[@id="menuForm:mainMenu"]/ul/li[5]/ul/table/tbody/tr/td[3]/ul/li[2]/a')  # お知らせ―>アンケート回答ボタン [NON CHANGED]
@@ -150,8 +151,9 @@ def answer_fb():
 
 
 def check_hw():
+    any_notice = 0
     global MESSAGE
-    MESSAGE += '\n\n---  Class Stuff  ----------\n'
+    MESSAGE += '\n\n《授業関連》\n'
 
     wait.until(expected_conditions.element_to_be_clickable(
         (By.ID, 'funcForm:j_idt361:j_idt2402:0:j_idt2481')))  # 一番上のクラスのクラスプロファイル
@@ -183,11 +185,13 @@ def check_hw():
                     if flag == False:
                         print(class_name)
                         MESSAGE += class_name
+                        any_notice += 1
                         flag = True
                     print("・{}が終了していません".format(content_name))
                     print("・{}".format(remain_hw))
                     MESSAGE += "・{}が終了していません\n".format(content_name)
                     MESSAGE += "・[{}]\n\n".format(remain_hw)
+                    any_notice += 1
                     if content_name != '課題提出':
                         continue
                     content.click()
@@ -201,6 +205,7 @@ def check_hw():
                                 hw_num + 1)).text  # 課題提出終了日時
                         print('{}が{}までです'.format(hw_name, hw_deadline))
                         MESSAGE += '・{}が{}までです\n\n'.format(hw_name, hw_deadline)
+                        any_notice += 1
                     driver.find_element_by_id('functionHeaderForm:j_idt148').click()  # 左上のTOPボタン
 
             except:
@@ -210,9 +215,11 @@ def check_hw():
                         if flag == False:
                             print(class_name)
                             MESSAGE += class_name
+                            any_notice += 1
                             flag = True
                         print("・{}に新しい内容があります".format(content_name))
                         MESSAGE += "・{}に新しい内容があります\n".format(content_name)
+                        any_notice += 1
                 except:
                     pass
 
@@ -221,7 +228,8 @@ def check_hw():
             driver.find_element_by_id('functionHeaderForm:j_idt154').click()  # 次の授業をクリック
 
     back_home()
-
+    if any_notice == 0:
+        MESSAGE = '\n授業関連でのお知らせはありません\n'
 
 def fin_action():
     global MESSAGE
