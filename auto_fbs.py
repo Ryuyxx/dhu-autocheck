@@ -21,6 +21,7 @@ bot = LINENotifyBot(access_token=myself)
 options = Options()
 options.add_argument('--headless')
 driver = webdriver.Chrome(options=options)
+# driver = webdriver.Chrome()
 url = 'https://portal.dhw.ac.jp/uprx/up/pk/pky001/Pky00101.xhtml'
 driver.implicitly_wait(3)  # 3-5
 wait = WebDriverWait(driver, 3)
@@ -28,21 +29,24 @@ wait = WebDriverWait(driver, 3)
 MESSAGE = ''
 
 
-def java_click_byclassname2(id1,id2):
+def java_click_byclassname2(id1, id2):
     # wait.until(expected_conditions.visibility_of_element_located((By.CLASS_NAME, id1)))
     element = driver.find_element_by_class_name(id1).find_element_by_class_name(id2)
     driver.execute_script("arguments[0].click();", element)
     sleep(0.5)
 
+
 def fbsubmit():
     global MESSAGE
     fb_title = driver.find_element_by_class_name('enqHeaderTitle').text  # fb授業名 [NON CHANGED]
     driver.find_element_by_class_name('btnAltColor').click()  # 回答ボタン [TEST]
-    java_click_byclassname2('dlgCaution','ui-button-text-icon-left') #ok1 [TEST]
-    java_click_byclassname2('dlgWarning','ui-button-text-icon-left') #ok2 [TEST]
-    wait.until(expected_conditions.visibility_of_element_located((By.ID, 'functionHeaderForm:breadCrumb')))  # アンケート回答一覧バー [TEST]
+    java_click_byclassname2('dlgCaution', 'ui-button-text-icon-left')  # ok1 [TEST]
+    java_click_byclassname2('dlgWarning', 'ui-button-text-icon-left')  # ok2 [TEST]
+    wait.until(expected_conditions.visibility_of_element_located(
+        (By.ID, 'functionHeaderForm:breadCrumb')))  # アンケート回答一覧バー [TEST]
     print("Submit")
     MESSAGE += "\n・{} を提出しました\n".format(fb_title)
+
 
 def login(username, password):
     global MESSAGE
@@ -76,16 +80,19 @@ def back_home():
 def answer_fb():
     global MESSAGE
     MESSAGE += '\n\n《フィードバックシート》\n'
-    wait.until(expected_conditions.visibility_of_element_located((By.ID, 'headerForm:j_idt67')))  # ID:top img [NON CHANGED]
+    wait.until(
+        expected_conditions.visibility_of_element_located((By.ID, 'headerForm:j_idt67')))  # ID:top img [NON CHANGED]
     webElement = driver.find_element_by_xpath(
         '//*[@id="menuForm:mainMenu"]/ul/li[5]/ul/table/tbody/tr/td[3]/ul/li[2]/a')  # お知らせ―>アンケート回答ボタン [NON CHANGED]
     driver.execute_script("arguments[0].click();", webElement)
     sleep(1)
 
-    wait.until(expected_conditions.visibility_of_element_located((By.ID, 'functionHeaderForm:breadCrumb')))  # アンケート回答一覧バー [TEST]
+    wait.until(expected_conditions.visibility_of_element_located(
+        (By.ID, 'functionHeaderForm:breadCrumb')))  # アンケート回答一覧バー [TEST]
     sleep(0.5)
     if driver.find_element_by_class_name('ctgrHeaderGrid'):  # フィードバックシートの横バー [NON CHANGED]
-        get_remaining_fb = len(driver.find_elements_by_class_name('ui-panelgrid-even'))  # check len of fbs [NON CHANGED]
+        get_remaining_fb = len(
+            driver.find_elements_by_class_name('ui-panelgrid-even'))  # check len of fbs [NON CHANGED]
         if len(driver.find_elements_by_class_name('ctgrHeaderGrid')) > 1:  # フィードバックシートの横バー [NON CHANGED]
             get_remaining_fb -= 1
 
@@ -96,11 +103,15 @@ def answer_fb():
         subjects = [
             "フィードバックシート（捜査と裁判）",
         ]
+        self_subjects = {
+            "フィードバックシート（Webデザイン概論）",
+        }
         for i in range(get_remaining_fb):
 
             fbss = driver.find_elements_by_class_name('enqName')  # フィードバックシートリスト取得 [NON CHANGED]
 
-            fin_or_yets = driver.find_elements_by_class_name('sign')[fbs_list_num].text # 一番上にあるフィードバックシートの回答済みか [NON CHANGED]
+            fin_or_yets = driver.find_elements_by_class_name('sign')[
+                fbs_list_num].text  # 一番上にあるフィードバックシートの回答済みか [NON CHANGED]
             if fin_or_yets == '回答済':
                 text = "All answered"
                 msg_text = "\nフィードバックシートはすべて回答されています😉\n"
@@ -112,15 +123,17 @@ def answer_fb():
                 break
 
             fbss[fbs_list_num].click()
-            wait.until(expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'enqHeaderTitle'))) #fb授業名表示されるまで [NON CHANGED]
+            wait.until(expected_conditions.visibility_of_element_located(
+                (By.CLASS_NAME, 'enqHeaderTitle')))  # fb授業名表示されるまで [NON CHANGED]
+            fb_title = driver.find_element_by_class_name('enqHeaderTitle').text  # fb授業名 [NON CHANGED]
 
             try:
-                q1 = driver.find_elements_by_class_name('ui-selectoneradio')[0] #ボタン選択式エリアがあるか [TEST]
-                q3 = driver.find_elements_by_class_name('ui-selectoneradio')[1] #ボタン選択式エリアがあるか [TEST]
-                q4 = driver.find_elements_by_class_name('ui-selectoneradio')[2] #ボタン選択式エリアがあるか [TEST]
-
+                q1 = driver.find_elements_by_class_name('ui-selectoneradio')[0]  # ボタン選択式エリアがあるか [TEST]
+                q3 = driver.find_elements_by_class_name('ui-selectoneradio')[1]  # ボタン選択式エリアがあるか [TEST]
+                q4 = driver.find_elements_by_class_name('ui-selectoneradio')[2]  # ボタン選択式エリアがあるか [TEST]
+                if fb_title in self_subjects:
+                    MESSAGE += "\n・{}には課題を入力する必要があります。後で追記してください\n".format(fb_title)
             except:
-                fb_title = driver.find_element_by_class_name('enqHeaderTitle').text  # fb授業名 [NON CHANGED]
                 if fb_title in subjects:
                     fbsubmit()
                     continue
@@ -131,11 +144,10 @@ def answer_fb():
                     driver.find_element_by_xpath(
                         '//*[@id="functionHeaderForm:breadCrumb"]/ul/li[1]/a').click()  # 左上アンケート回答一覧リンク [NON CHANGED]
                     continue
-
-            q1.find_elements_by_class_name('ui-radiobutton')[0].click() # q1理解できた
-            q3.find_elements_by_class_name('ui-radiobutton')[1].click() # q2理解できた
+            q1.find_elements_by_class_name('ui-radiobutton')[0].click()  # q1理解できた
+            q3.find_elements_by_class_name('ui-radiobutton')[1].click()  # q2理解できた
             random_select_num = random.randrange(0, 5, 2)
-            q4.find_elements_by_class_name('ui-radiobutton')[random_select_num].click() # q4 ランダム選択
+            q4.find_elements_by_class_name('ui-radiobutton')[random_select_num].click()  # q4 ランダム選択
 
             fbsubmit()
             if get_remaining_fb == 1:
@@ -229,6 +241,7 @@ def check_hw():
     back_home()
     if any_notice == 0:
         MESSAGE += '\n授業関連でのお知らせはありません\n'
+
 
 def fin_action():
     global MESSAGE
