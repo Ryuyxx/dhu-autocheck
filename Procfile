@@ -1,1 +1,1 @@
-dhu-autocheck: python auto_fbs.py
+autodhu: python auto_fbs.py
