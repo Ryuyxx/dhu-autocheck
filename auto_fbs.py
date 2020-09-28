@@ -15,7 +15,7 @@ users = [
     {"USERNAME": "A19DC132", "PASSWORD": "ameneko0422"},
 ]
 
-myself = "amHdHYRhdd9aqJImvTI2jhSlI0lciHHoEqbZnIoYSO0"  # dhw
+myself = "cOSdNL5uBPUeNOClZCXQHKQwaTOXXjn6AsZl8uctdQ5"  # dhw
 bot = LINENotifyBot(access_token=myself)
 
 options = Options()
@@ -39,11 +39,11 @@ def java_click_byclassname2(id1, id2):
 def fbsubmit():
     global MESSAGE
     fb_title = driver.find_element_by_class_name('enqHeaderTitle').text  # fb授業名 [NON CHANGED]
-    driver.find_element_by_class_name('btnAltColor').click()  # 回答ボタン [TEST]
-    java_click_byclassname2('dlgCaution', 'ui-button-text-icon-left')  # ok1 [TEST]
-    java_click_byclassname2('dlgWarning', 'ui-button-text-icon-left')  # ok2 [TEST]
+    driver.find_element_by_class_name('btnAltColor').click()  # 回答ボタン [NON CHANGED]
+    java_click_byclassname2('dlgCaution', 'ui-button-text-icon-left')  # ok1 [NON CHANGED]
+    java_click_byclassname2('dlgWarning', 'ui-button-text-icon-left')  # ok2 [NON CHANGED]
     wait.until(expected_conditions.visibility_of_element_located(
-        (By.ID, 'functionHeaderForm:breadCrumb')))  # アンケート回答一覧バー [TEST]
+        (By.ID, 'functionHeaderForm:breadCrumb')))  # アンケート回答一覧バー [NON CHANGED]
     print("Submit")
     MESSAGE += "\n・{} を提出しました\n".format(fb_title)
 
@@ -88,7 +88,7 @@ def answer_fb():
     sleep(1)
 
     wait.until(expected_conditions.visibility_of_element_located(
-        (By.ID, 'functionHeaderForm:breadCrumb')))  # アンケート回答一覧バー [TEST]
+        (By.ID, 'functionHeaderForm:breadCrumb')))  # アンケート回答一覧バー [NON CHANGED]
     sleep(0.5)
     if driver.find_element_by_class_name('ctgrHeaderGrid'):  # フィードバックシートの横バー [NON CHANGED]
         get_remaining_fb = len(
@@ -110,8 +110,7 @@ def answer_fb():
 
             fbss = driver.find_elements_by_class_name('enqName')  # フィードバックシートリスト取得 [NON CHANGED]
 
-            fin_or_yets = driver.find_elements_by_class_name('sign')[
-                fbs_list_num].text  # 一番上にあるフィードバックシートの回答済みか [NON CHANGED]
+            fin_or_yets = driver.find_elements_by_class_name('sign')[fbs_list_num].text  # 一番上にあるフィードバックシートの回答済みか [NON CHANGED]
             if fin_or_yets == '回答済':
                 text = "All answered"
                 msg_text = "\nフィードバックシートはすべて回答されています😉\n"
@@ -123,14 +122,13 @@ def answer_fb():
                 break
 
             fbss[fbs_list_num].click()
-            wait.until(expected_conditions.visibility_of_element_located(
-                (By.CLASS_NAME, 'enqHeaderTitle')))  # fb授業名表示されるまで [NON CHANGED]
+            wait.until(expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'enqHeaderTitle')))  # fb授業名表示されるまで [NON CHANGED]
             fb_title = driver.find_element_by_class_name('enqHeaderTitle').text  # fb授業名 [NON CHANGED]
 
             try:
-                q1 = driver.find_elements_by_class_name('ui-selectoneradio')[0]  # ボタン選択式エリアがあるか [TEST]
-                q3 = driver.find_elements_by_class_name('ui-selectoneradio')[1]  # ボタン選択式エリアがあるか [TEST]
-                q4 = driver.find_elements_by_class_name('ui-selectoneradio')[2]  # ボタン選択式エリアがあるか [TEST]
+                q1 = driver.find_elements_by_class_name('ui-selectoneradio')[0]  # ボタン選択式エリアがあるか [NON CHANGED]
+                q3 = driver.find_elements_by_class_name('ui-selectoneradio')[1]  # ボタン選択式エリアがあるか [NON CHANGED]
+                q4 = driver.find_elements_by_class_name('ui-selectoneradio')[2]  # ボタン選択式エリアがあるか [NON CHANGED]
                 if fb_title in self_subjects:
                     MESSAGE += "\n・{}には課題を入力する必要があります。後で追記してください\n".format(fb_title)
             except:
@@ -140,9 +138,15 @@ def answer_fb():
                 else:
                     print("{}\n上記授業は通常フォーマットに該当しません スキップします\n".format(fb_title))
                     MESSAGE += "\n・{}はスキップされます\n".format(fb_title)
-                    fbs_list_num += 1
                     driver.find_element_by_xpath(
                         '//*[@id="functionHeaderForm:breadCrumb"]/ul/li[1]/a').click()  # 左上アンケート回答一覧リンク [NON CHANGED]
+                    deadline_texts =  driver.find_elements_by_class_name('kigen')[fbs_list_num].text
+                    deadlineCount = int(re.compile('\d+').findall(re.findall("（.*）",deadline_texts)[0])[fbs_list_num])
+                    if deadlineCount <= 1:
+                        MESSAGE += "⚠️{}\n\n".format(deadline_texts.replace('2020/',''))
+                    else:
+                        MESSAGE += "・{}\n\n".format(deadline_texts.replace('2020/',''))
+                    fbs_list_num += 1
                     continue
             q1.find_elements_by_class_name('ui-radiobutton')[0].click()  # q1理解できた
             q3.find_elements_by_class_name('ui-radiobutton')[1].click()  # q2理解できた
@@ -244,11 +248,8 @@ def check_hw():
 
 
 def fin_action():
-    global MESSAGE
-
     sleep(0.5)
     print("\nProcess Finished\n")
-    # MESSAGE += "\nProcess Finished"
     driver.quit()
 
 
