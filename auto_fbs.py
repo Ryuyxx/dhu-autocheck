@@ -12,7 +12,7 @@ from Notify import LINENotifyBot
 users = [
     {"USERNAME": "A19DC154", "PASSWORD": "Ryuya1045_"},
     {"USERNAME": "A19DC558", "PASSWORD": "93041419"},
-    {"USERNAME": "A19DC132", "PASSWORD": "ameneko0422"},
+    #{"USERNAME": "A19DC132", "PASSWORD": "ameneko0422"},
 ]
 
 myself = "cOSdNL5uBPUeNOClZCXQHKQwaTOXXjn6AsZl8uctdQ5"  # dhw
