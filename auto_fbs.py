@@ -9,7 +9,6 @@ import random
 import re, os
 from Notify import LINENotifyBot
 
-
 users = [
     {"USERNAME": "A19DC154", "PASSWORD": os.environ["A19DC154"]},
     {"USERNAME": "A19DC558", "PASSWORD": os.environ["A19DC558"]},
@@ -137,12 +136,12 @@ def answer_fb():
                     MESSAGE += "\n・{}はスキップされます\n".format(fb_title)
                     driver.find_element_by_xpath(
                         '//*[@id="functionHeaderForm:breadCrumb"]/ul/li[1]/a').click()
-                    deadline_texts =  driver.find_elements_by_class_name('kigen')[fbs_list_num].text
-                    deadlineCount = int(re.compile('\d+').findall(re.findall("（.*）",deadline_texts)[0])[fbs_list_num])
+                    deadline_texts = driver.find_elements_by_class_name('kigen')[fbs_list_num].text
+                    deadlineCount = int(re.compile('\d+').findall(re.findall("（.*）", deadline_texts)[0])[fbs_list_num])
                     if deadlineCount <= 1:
-                        MESSAGE += "⚠️{}\n\n".format(deadline_texts.replace('2020/',''))
+                        MESSAGE += "⚠️{}\n\n".format(deadline_texts.replace('2020/', ''))
                     else:
-                        MESSAGE += "・{}\n\n".format(deadline_texts.replace('2020/',''))
+                        MESSAGE += "・{}\n\n".format(deadline_texts.replace('2020/', ''))
                     fbs_list_num += 1
                     continue
             q1.find_elements_by_class_name('ui-radiobutton')[0].click()
