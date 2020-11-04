@@ -12,7 +12,7 @@ from Notify import LINENotifyBot
 users = [
     {"USERNAME": "A19DC154", "PASSWORD": os.environ["A19DC154"]},
     {"USERNAME": "A19DC558", "PASSWORD": os.environ["A19DC558"]},
-    {"USERNAME": "A19DC132", "PASSWORD": os.environ["A19DC132"]},
+#     {"USERNAME": "A19DC132", "PASSWORD": os.environ["A19DC132"]},
 ]
 
 myself = os.environ["lineAPI"]
