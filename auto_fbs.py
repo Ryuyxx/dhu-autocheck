@@ -15,6 +15,9 @@ users = [
 #     {"USERNAME": "A19DC132", "PASSWORD": os.environ["A19DC132"]},
 ]
 
+# users = [
+#     {"USERNAME": "A19DC154", "PASSWORD": ""}
+
 myself = os.environ["lineAPI"]
 bot = LINENotifyBot(access_token=myself)
 
@@ -87,74 +90,77 @@ def answer_fb():
     wait.until(expected_conditions.visibility_of_element_located(
         (By.ID, 'functionHeaderForm:breadCrumb')))
     sleep(0.5)
-    if driver.find_element_by_class_name('ctgrHeaderGrid'):
-        get_remaining_fb = len(
-            driver.find_elements_by_class_name('ui-panelgrid-even'))
-        if len(driver.find_elements_by_class_name('ctgrHeaderGrid')) > 1:
-            get_remaining_fb -= 1
 
-        print("\nDetected {} Feedback-Sheet\n".format(get_remaining_fb))
+    try:
+        if driver.find_element_by_class_name('ctgrHeaderGrid'):
+            get_remaining_fb = len(
+                driver.find_elements_by_class_name('ui-panelgrid-even'))
+            if len(driver.find_elements_by_class_name('ctgrHeaderGrid')) > 1:
+                get_remaining_fb -= 1
 
-        fbs_list_num = 0
-        subjects = [
-            "フィードバックシート（捜査と裁判）",
-        ]
-        self_subjects = {
-            "フィードバックシート（Webデザイン概論）",
-        }
-        for i in range(get_remaining_fb):
+            print("\nDetected {} Feedback-Sheet\n".format(get_remaining_fb))
 
-            fbss = driver.find_elements_by_class_name('enqName')
+            fbs_list_num = 0
+            subjects = [
+                "フィードバックシート（捜査と裁判）",
+            ]
+            self_subjects = {
+                "フィードバックシート（Webデザイン概論）",
+            }
+            for i in range(get_remaining_fb):
 
-            fin_or_yets = driver.find_elements_by_class_name('sign')[fbs_list_num].text
-            if fin_or_yets == '回答済':
-                text = "All answered"
-                msg_text = "\nフィードバックシートはすべて回答されています😉\n"
-                if fbs_list_num != 0:
-                    text = "Remaining {} Feedback Sheet".format(fbs_list_num)
-                    msg_text = "\n{}個フィードバックシートが残っています🙁\n".format(fbs_list_num)
-                print(text)
-                MESSAGE += msg_text
-                break
+                fbss = driver.find_elements_by_class_name('enqName')
 
-            fbss[fbs_list_num].click()
-            wait.until(expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'enqHeaderTitle')))
-            fb_title = driver.find_element_by_class_name('enqHeaderTitle').text
+                fin_or_yets = driver.find_elements_by_class_name('sign')[fbs_list_num].text
+                if fin_or_yets == '回答済':
+                    text = "All answered"
+                    msg_text = "\nフィードバックシートはすべて回答されています😉\n"
+                    if fbs_list_num != 0:
+                        text = "Remaining {} Feedback Sheet".format(fbs_list_num)
+                        msg_text = "\n{}個フィードバックシートが残っています🙁\n".format(fbs_list_num)
+                    print(text)
+                    MESSAGE += msg_text
+                    break
 
-            try:
-                q1 = driver.find_elements_by_class_name('ui-selectoneradio')[0]
-                q3 = driver.find_elements_by_class_name('ui-selectoneradio')[1]
-                q4 = driver.find_elements_by_class_name('ui-selectoneradio')[2]
-                if fb_title in self_subjects:
-                    MESSAGE += "\n・{}には課題を入力する必要があります。後で追記してください\n".format(fb_title)
-            except:
-                if fb_title in subjects:
-                    fbsubmit()
-                    continue
-                else:
-                    print("{}\n上記授業は通常フォーマットに該当しません スキップします\n".format(fb_title))
-                    MESSAGE += "\n・{}はスキップされます\n".format(fb_title)
-                    driver.find_element_by_xpath(
-                        '//*[@id="functionHeaderForm:breadCrumb"]/ul/li[1]/a').click()
-                    deadline_texts = driver.find_elements_by_class_name('kigen')[fbs_list_num].text
-                    deadlineCount = int(re.compile('\d+').findall(re.findall("（.*）", deadline_texts)[0])[fbs_list_num])
-                    if deadlineCount <= 1:
-                        MESSAGE += "⚠️{}\n\n".format(deadline_texts.replace('2020/', ''))
+                fbss[fbs_list_num].click()
+                wait.until(expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'enqHeaderTitle')))
+                fb_title = driver.find_element_by_class_name('enqHeaderTitle').text
+
+                try:
+                    q1 = driver.find_elements_by_class_name('ui-selectoneradio')[0]
+                    q3 = driver.find_elements_by_class_name('ui-selectoneradio')[1]
+                    q4 = driver.find_elements_by_class_name('ui-selectoneradio')[2]
+                    if fb_title in self_subjects:
+                        MESSAGE += "\n・{}には課題を入力する必要があります。後で追記してください\n".format(fb_title)
+                except:
+                    if fb_title in subjects:
+                        fbsubmit()
+                        continue
                     else:
-                        MESSAGE += "・{}\n\n".format(deadline_texts.replace('2020/', ''))
-                    fbs_list_num += 1
-                    continue
-            q1.find_elements_by_class_name('ui-radiobutton')[0].click()
-            q3.find_elements_by_class_name('ui-radiobutton')[1].click()
-            random_select_num = random.randrange(0, 5, 2)
-            q4.find_elements_by_class_name('ui-radiobutton')[random_select_num].click()
+                        print("{}\n上記授業は通常フォーマットに該当しません スキップします\n".format(fb_title))
+                        MESSAGE += "\n・{}はスキップされます\n".format(fb_title)
+                        driver.find_element_by_xpath(
+                            '//*[@id="functionHeaderForm:breadCrumb"]/ul/li[1]/a').click()
+                        deadline_texts = driver.find_elements_by_class_name('kigen')[fbs_list_num].text
+                        deadlineCount = int(
+                            re.compile('\d+').findall(re.findall("（.*）", deadline_texts)[0])[fbs_list_num])
+                        if deadlineCount <= 1:
+                            MESSAGE += "⚠️{}\n\n".format(deadline_texts.replace('2020/', ''))
+                        else:
+                            MESSAGE += "・{}\n\n".format(deadline_texts.replace('2020/', ''))
+                        fbs_list_num += 1
+                        continue
+                q1.find_elements_by_class_name('ui-radiobutton')[0].click()
+                q3.find_elements_by_class_name('ui-radiobutton')[1].click()
+                random_select_num = random.randrange(0, 5, 2)
+                q4.find_elements_by_class_name('ui-radiobutton')[random_select_num].click()
 
-            fbsubmit()
-            if get_remaining_fb == 1:
-                print("All answered")
-                MESSAGE += "\nフィードバックシートはすべて回答されています😉\n"
+                fbsubmit()
+                if get_remaining_fb == 1:
+                    print("All answered")
+                    MESSAGE += "\nフィードバックシートはすべて回答されています😉\n"
 
-    else:
+    except:
         print("\n----  No Feedback Sheet  ----\n")
         MESSAGE += "\n----  No Feedback Sheet  ----\n"
 
