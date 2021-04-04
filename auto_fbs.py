@@ -3,20 +3,18 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
 from time import sleep
 import random
 import re, os
+from dotenv import load_dotenv
 from Notify import LINENotifyBot
 
-users = [
-    {"USERNAME": "A19DC154", "PASSWORD": os.environ["A19DC154"]},
-    {"USERNAME": "A19DC558", "PASSWORD": os.environ["A19DC558"]},
-#     {"USERNAME": "A19DC132", "PASSWORD": os.environ["A19DC132"]},
-]
+load_dotenv()
 
-# users = [
-#     {"USERNAME": "A19DC154", "PASSWORD": ""}
+users = [
+    {"USERNAME": os.environ["User1"], "PASSWORD": os.environ["User1P"]},
+    {"USERNAME": os.environ["User2"], "PASSWORD": os.environ["User2P"]},
+]
 
 myself = os.environ["lineAPI"]
 bot = LINENotifyBot(access_token=myself)
@@ -80,13 +78,16 @@ def back_home():
 def answer_fb():
     global MESSAGE
     MESSAGE += '\n\n《フィードバックシート》\n'
+    # 左上ロゴ
     wait.until(
         expected_conditions.visibility_of_element_located((By.ID, 'headerForm:j_idt67')))
+    # アンケート回答
     webElement = driver.find_element_by_xpath(
-        '//*[@id="menuForm:mainMenu"]/ul/li[5]/ul/table/tbody/tr/td[3]/ul/li[2]/a')
+        '//*[@id="menuForm:mainMenu"]/ul/li[5]/ul/table/tbody/tr/td[4]/ul/li[2]/a')
     driver.execute_script("arguments[0].click();", webElement)
     sleep(1)
 
+    # アンケート回答一覧
     wait.until(expected_conditions.visibility_of_element_located(
         (By.ID, 'functionHeaderForm:breadCrumb')))
     sleep(0.5)
@@ -101,12 +102,7 @@ def answer_fb():
             print("\nDetected {} Feedback-Sheet\n".format(get_remaining_fb))
 
             fbs_list_num = 0
-            subjects = [
-                "フィードバックシート（捜査と裁判）",
-            ]
-            self_subjects = {
-                "フィードバックシート（Webデザイン概論）",
-            }
+
             for i in range(get_remaining_fb):
 
                 fbss = driver.find_elements_by_class_name('enqName')
@@ -130,26 +126,21 @@ def answer_fb():
                     q1 = driver.find_elements_by_class_name('ui-selectoneradio')[0]
                     q3 = driver.find_elements_by_class_name('ui-selectoneradio')[1]
                     q4 = driver.find_elements_by_class_name('ui-selectoneradio')[2]
-                    if fb_title in self_subjects:
-                        MESSAGE += "\n・{}には課題を入力する必要があります。後で追記してください\n".format(fb_title)
+
                 except:
-                    if fb_title in subjects:
-                        fbsubmit()
-                        continue
+                    print("{}\n上記授業は通常フォーマットに該当しません スキップします\n".format(fb_title))
+                    MESSAGE += "\n・{}はスキップされます\n".format(fb_title)
+                    driver.find_element_by_xpath(
+                        '//*[@id="functionHeaderForm:breadCrumb"]/ul/li[1]/a').click()
+                    deadline_texts = driver.find_elements_by_class_name('kigen')[fbs_list_num].text
+                    deadlineCount = int(
+                        re.compile('\d+').findall(re.findall("（.*）", deadline_texts)[0])[fbs_list_num])
+                    if deadlineCount <= 1:
+                        MESSAGE += "⚠️{}\n\n".format(deadline_texts.replace('2020/', ''))
                     else:
-                        print("{}\n上記授業は通常フォーマットに該当しません スキップします\n".format(fb_title))
-                        MESSAGE += "\n・{}はスキップされます\n".format(fb_title)
-                        driver.find_element_by_xpath(
-                            '//*[@id="functionHeaderForm:breadCrumb"]/ul/li[1]/a').click()
-                        deadline_texts = driver.find_elements_by_class_name('kigen')[fbs_list_num].text
-                        deadlineCount = int(
-                            re.compile('\d+').findall(re.findall("（.*）", deadline_texts)[0])[fbs_list_num])
-                        if deadlineCount <= 1:
-                            MESSAGE += "⚠️{}\n\n".format(deadline_texts.replace('2020/', ''))
-                        else:
-                            MESSAGE += "・{}\n\n".format(deadline_texts.replace('2020/', ''))
-                        fbs_list_num += 1
-                        continue
+                        MESSAGE += "・{}\n\n".format(deadline_texts.replace('2020/', ''))
+                    fbs_list_num += 1
+                    continue
                 q1.find_elements_by_class_name('ui-radiobutton')[0].click()
                 q3.find_elements_by_class_name('ui-radiobutton')[1].click()
                 random_select_num = random.randrange(0, 5, 2)
@@ -162,7 +153,7 @@ def answer_fb():
 
     except:
         print("\n----  No Feedback Sheet  ----\n")
-        MESSAGE += "\n----  No Feedback Sheet  ----\n"
+        MESSAGE += "\n・検出出来ません\n"
 
     back_home()
 
