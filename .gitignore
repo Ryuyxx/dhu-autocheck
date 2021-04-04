@@ -1,7 +1,6 @@
-.env
-
 __pycache__
 venv
 .idea
+.env
 
 chromedriver.exe
