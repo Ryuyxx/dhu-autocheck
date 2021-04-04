@@ -8,3 +8,10 @@
 * Heroku -> Web scraping -> Line API -> LINE Notify on iphone
 
 ※当プログラムは教育目的での開発である
+
+
+## Requirement
+
+- selenium
+- requests 
+- python-dotenv
