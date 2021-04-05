@@ -20,7 +20,7 @@ myself = os.environ["lineAPI"]
 bot = LINENotifyBot(access_token=myself)
 
 options = Options()
-# options.add_argument('--headless')
+options.add_argument('--headless')
 driver = webdriver.Chrome(options=options)
 url = os.environ["DHWURL"]
 driver.implicitly_wait(3)
