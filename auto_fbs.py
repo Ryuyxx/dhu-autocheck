@@ -6,10 +6,10 @@ from selenium.webdriver.common.by import By
 from time import sleep
 import random
 import re, os
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from Notify import LINENotifyBot
 
-load_dotenv()
+# load_dotenv()
 
 users = [
     {"USERNAME": os.environ["User1"], "PASSWORD": os.environ["User1P"]},
@@ -112,10 +112,10 @@ def answer_fb():
         else:
             MESSAGE += "\n{}個フィードバックシートが残っています🙁\n".format(remaining_fb)
 
-            remaining_fb_lists = fb_block.find_elements_by_tag_name('tr')
+            for i in remaining_fb:
+                tds = driver.find_elements_by_class_name('ui-datatable-data')[0].find_elements_by_tag_name(
+                    'tr').find_elements_by_tag_name('td')
 
-            for fbs in remaining_fb_lists:
-                tds = fbs.find_elements_by_tag_name('td')
                 deadline_texts = tds[3].text[3:]
                 tds[0].click()
 
