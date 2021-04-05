@@ -117,7 +117,6 @@ def answer_fb():
             for fbs in remaining_fb_lists:
                 tds = fbs.find_elements_by_tag_name('td')
                 deadline_texts = tds[3].text[3:]
-                print(deadline_texts)
                 tds[0].click()
 
                 title = driver.find_element_by_class_name('enqHeaderTitle').text
