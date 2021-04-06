@@ -8,7 +8,7 @@ import random
 import re, os
 from Notify import LINENotifyBot
 
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 # load_dotenv()
 
 users = [
