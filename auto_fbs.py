@@ -6,10 +6,10 @@ from selenium.webdriver.common.by import By
 from time import sleep
 import random
 import re, os
-from dotenv import load_dotenv
 from Notify import LINENotifyBot
 
-load_dotenv()
+# from dotenv import load_dotenv
+# load_dotenv()
 
 users = [
     {"USERNAME": os.environ["User1"], "PASSWORD": os.environ["User1P"]},
