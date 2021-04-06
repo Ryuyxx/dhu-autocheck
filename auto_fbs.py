@@ -86,7 +86,7 @@ def fbsubmit(title):
 def answer_fb():
     global MESSAGE
     MESSAGE += '\n\n《フィードバックシート》\n'
-    # 左上ロゴ
+    # imgタグ表示まで待機
     wait.until(
         EC.visibility_of_element_located((By.TAG_NAME, 'img')))
     # アンケート回答
@@ -166,9 +166,11 @@ def check_hw():
     global MESSAGE
     MESSAGE += '\n\n《授業関連》\n'
 
-    wait.until(EC.element_to_be_clickable(
-        (By.ID, 'funcForm:j_idt361:j_idt2402:0:j_idt2481')))
-    driver.find_element_by_id('funcForm:j_idt361:j_idt2402:0:j_idt2481').click()
+    # imgタグ表示まで待機
+    wait.until(
+        EC.visibility_of_element_located((By.TAG_NAME, 'img')))
+    # クラスプロファイルボタン
+    driver.find_elements_by_class_name('ui-corner-bottom')[-1].find_elements_by_class_name('cpBtn')[0].click()
 
     click_num = len(driver.find_elements_by_class_name('classList'))
 
@@ -187,6 +189,7 @@ def check_hw():
 
         flag = False
         for class_element in range(7):
+            # 0-7までIDを代入しながら抽出
             content = driver.find_element_by_id('funcForm:j_idt329:{}:j_idt331'.format(class_element))
             content_name = content.find_element_by_class_name('inlineBlock').text
             try:
