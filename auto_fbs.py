@@ -1,15 +1,15 @@
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from time import sleep
 import random
 import re, os
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 from Notify import LINENotifyBot
 
-# load_dotenv()
+load_dotenv()
 
 users = [
     {"USERNAME": os.environ["User1"], "PASSWORD": os.environ["User1P"]},
@@ -40,7 +40,7 @@ def login(username, password):
     driver.get(url)
 
     webElement = 'loginForm:userId'
-    wait.until(expected_conditions.visibility_of_element_located(
+    wait.until(EC.visibility_of_element_located(
         (By.NAME, webElement)))
     user_input = driver.find_element_by_name(webElement)
     user_input.send_keys(username)
@@ -57,7 +57,7 @@ def login(username, password):
 
 
 def back_home():
-    wait.until(expected_conditions.visibility_of_element_located((By.XPATH, '//*[@id="headerForm"]/header/a')))
+    wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="headerForm"]/header/a')))
     main = driver.find_element_by_xpath('//*[@id="headerForm"]/header/a')
     driver.execute_script("arguments[0].click();", main)
     sleep(0.5)
@@ -72,7 +72,7 @@ def fbsubmit(title):
     # 回答します。よろしいですか?
     java_click_by_2classname('dlgWarning', 'ui-button-text-icon-left')
     # アンケート回答一覧バーを待機
-    wait.until(expected_conditions.visibility_of_element_located(
+    wait.until(EC.visibility_of_element_located(
         (By.ID, 'functionHeaderForm:breadCrumb')))
     # 回答した情報を更新させるために再度アンケート回答クリック
     webElement = driver.find_element_by_xpath(
@@ -88,7 +88,7 @@ def answer_fb():
     MESSAGE += '\n\n《フィードバックシート》\n'
     # 左上ロゴ
     wait.until(
-        expected_conditions.visibility_of_element_located((By.ID, 'headerForm:j_idt67')))
+        EC.visibility_of_element_located((By.TAG_NAME, 'img')))
     # アンケート回答
     webElement = driver.find_element_by_xpath(
         '//*[@id="menuForm:mainMenu"]/ul/li[5]/ul/table/tbody/tr/td[4]/ul/li[2]/a')
@@ -96,7 +96,7 @@ def answer_fb():
     sleep(1)
 
     # アンケート回答一覧
-    wait.until(expected_conditions.visibility_of_element_located(
+    wait.until(EC.visibility_of_element_located(
         (By.ID, 'functionHeaderForm:breadCrumb')))
     sleep(0.5)
 
@@ -166,7 +166,7 @@ def check_hw():
     global MESSAGE
     MESSAGE += '\n\n《授業関連》\n'
 
-    wait.until(expected_conditions.element_to_be_clickable(
+    wait.until(EC.element_to_be_clickable(
         (By.ID, 'funcForm:j_idt361:j_idt2402:0:j_idt2481')))
     driver.find_element_by_id('funcForm:j_idt361:j_idt2402:0:j_idt2481').click()
 
@@ -175,7 +175,7 @@ def check_hw():
     class_name_before = ''
     for nextClass_click in range(click_num):
         if nextClass_click != click_num - 1:
-            wait.until(expected_conditions.element_to_be_clickable((By.ID, 'functionHeaderForm:j_idt154')))
+            wait.until(EC.element_to_be_clickable((By.ID, 'functionHeaderForm:j_idt154')))
         class_name = driver.find_element_by_xpath('//*[@id="functionHeaderForm:j_idt137"]/div[1]').text
         class_name = '\n' + re.sub('\d', '', class_name).replace('ui-button', '').replace('　', '').replace(' ', '')
 
@@ -206,7 +206,7 @@ def check_hw():
                     if content_name != '課題提出':
                         continue
                     content.click()
-                    wait.until(expected_conditions.element_to_be_clickable(
+                    wait.until(EC.element_to_be_clickable(
                         (By.ID, 'functionHeaderForm:j_idt148')))
                     for hw_num in range(int(remain_hw_count)):
                         hw_name = driver.find_element_by_id(
