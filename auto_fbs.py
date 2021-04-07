@@ -79,8 +79,8 @@ def fbsubmit(title):
         '//*[@id="menuForm:mainMenu"]/ul/li[5]/ul/table/tbody/tr/td[4]/ul/li[2]/a')
     driver.execute_script("arguments[0].click();", webElement)
     sleep(1)
-    print("\n・{} を提出しました\n".format(title))
-    MESSAGE += "\n・{} を提出しました\n".format(title)
+    print("\n・{} を提出しました🤙\n".format(title))
+    MESSAGE += "\n・{} を提出しました🤙\n".format(title)
 
 
 def answer_fb():
@@ -110,11 +110,12 @@ def answer_fb():
             print("\nフィードバックシートはすべて回答されています😉\n")
             MESSAGE += "\nフィードバックシートはすべて回答されています😉\n"
         else:
+            print("\n{}個フィードバックシートが残っています🙁\n".format(remaining_fb))
             MESSAGE += "\n{}個フィードバックシートが残っています🙁\n".format(remaining_fb)
 
-            for i in remaining_fb:
+            for i in range(remaining_fb):
                 tds = driver.find_elements_by_class_name('ui-datatable-data')[0].find_elements_by_tag_name(
-                    'tr').find_elements_by_tag_name('td')
+                    'tr')[0].find_elements_by_tag_name('td')
 
                 deadline_texts = tds[3].text[3:]
                 tds[0].click()
