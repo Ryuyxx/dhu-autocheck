@@ -9,10 +9,10 @@ import re, os
 from Notify import LINENotifyBot
 
 from dotenv import load_dotenv
-# load_dotenv()
+load_dotenv()
 
 users = [
-    {"USERNAME": os.environ["User1"], "PASSWORD": os.environ["User1P"]},
+    # {"USERNAME": os.environ["User1"], "PASSWORD": os.environ["User1P"]},
     {"USERNAME": os.environ["User2"], "PASSWORD": os.environ["User2P"]},
 ]
 
@@ -20,7 +20,7 @@ myself = os.environ["lineAPI"]
 bot = LINENotifyBot(access_token=myself)
 
 options = Options()
-options.add_argument('--headless')
+# options.add_argument('--headless')
 driver = webdriver.Chrome(options=options)
 url = os.environ["DHWURL"]
 driver.implicitly_wait(3)
@@ -218,6 +218,7 @@ def check_hw():
                         hw_deadline = driver.find_element_by_xpath(
                             '//*[@id="funcForm:gakKdiTstList_data"]/tr[{}]/td[6]/span'.format(
                                 hw_num + 1)).text
+                        # TODO 期日が近づいていた際の通知
                         print('{}が{}までです'.format(hw_name, hw_deadline))
                         MESSAGE += '・{}が{}までです\n\n'.format(hw_name, hw_deadline)
                         any_notice += 1
