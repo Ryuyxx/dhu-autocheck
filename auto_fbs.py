@@ -9,10 +9,10 @@ import re, os
 from Notify import LINENotifyBot
 
 from dotenv import load_dotenv
-load_dotenv()
+# load_dotenv()
 
 users = [
-    # {"USERNAME": os.environ["User1"], "PASSWORD": os.environ["User1P"]},
+    {"USERNAME": os.environ["User1"], "PASSWORD": os.environ["User1P"]},
     {"USERNAME": os.environ["User2"], "PASSWORD": os.environ["User2P"]},
 ]
 
@@ -20,7 +20,7 @@ myself = os.environ["lineAPI"]
 bot = LINENotifyBot(access_token=myself)
 
 options = Options()
-# options.add_argument('--headless')
+options.add_argument('--headless')
 driver = webdriver.Chrome(options=options)
 url = os.environ["DHWURL"]
 driver.implicitly_wait(3)
