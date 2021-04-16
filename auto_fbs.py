@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 users = [
     {"USERNAME": os.environ["User1"], "PASSWORD": os.environ["User1P"]},
     {"USERNAME": os.environ["User2"], "PASSWORD": os.environ["User2P"]},
+    {"USERNAME": os.environ["User3"], "PASSWORD": os.environ["User3P"]},
 ]
 
 myself = os.environ["lineAPI"]
