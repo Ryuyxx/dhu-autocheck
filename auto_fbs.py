@@ -92,7 +92,7 @@ def answer_fb():
         EC.visibility_of_element_located((By.TAG_NAME, 'img')))
     # アンケート回答
     webElement = driver.find_element_by_xpath(
-        '//*[@id="menuForm:mainMenu"]/ul/li[5]/ul/table/tbody/tr/td[4]/ul/li[2]/a')
+        '//*[@id="menuForm:mainMenu"]/ul/li[5]/ul/table/tbody/tr/td[3]/ul/li[2]/a')
     driver.execute_script("arguments[0].click();", webElement)
     sleep(1)
 
