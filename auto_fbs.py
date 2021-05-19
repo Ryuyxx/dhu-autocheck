@@ -4,11 +4,11 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from time import sleep
-import random
-import re, os
+import re, os, random
 from Notify import LINENotifyBot
 
 from dotenv import load_dotenv
+
 # load_dotenv()
 
 users = [
@@ -31,12 +31,24 @@ MESSAGE = ''
 
 
 def java_click_by_2classname(id1, id2):
+    """
+    ネストされた要素をクリックする
+    :param id1: 親要素
+    :param id2: 子要素
+    :return: None
+    """
     element = driver.find_element_by_class_name(id1).find_element_by_class_name(id2)
     driver.execute_script("arguments[0].click();", element)
     sleep(0.5)
 
 
 def login(username, password):
+    """
+    ログイン処理
+    :param username: 番号
+    :param password: パスワード
+    :return: None
+    """
     global MESSAGE
     driver.get(url)
 
@@ -58,13 +70,21 @@ def login(username, password):
 
 
 def back_home():
+    """
+    LPへ画面を戻す処理
+    :return: None
+    """
     wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="headerForm"]/header/a')))
-    main = driver.find_element_by_xpath('//*[@id="headerForm"]/header/a')
-    driver.execute_script("arguments[0].click();", main)
+    driver.execute_script("arguments[0].click();", driver.find_element_by_xpath('//*[@id="headerForm"]/header/a'))
     sleep(0.5)
 
 
 def fbsubmit(title):
+    """
+    入力完了後の提出処理
+    :param title: 授業タイトル
+    :return: None
+    """
     global MESSAGE
     # 回答ボタン
     driver.find_element_by_class_name('btnAltColor').click()
@@ -76,24 +96,26 @@ def fbsubmit(title):
     wait.until(EC.visibility_of_element_located(
         (By.ID, 'functionHeaderForm:breadCrumb')))
     # 回答した情報を更新させるために再度アンケート回答クリック
-    webElement = driver.find_element_by_xpath(
-        '//*[@id="menuForm:mainMenu"]/ul/li[5]/ul/table/tbody/tr/td[4]/ul/li[2]/a')
-    driver.execute_script("arguments[0].click();", webElement)
+    driver.execute_script("arguments[0].click();", driver.find_element_by_xpath(
+        '//*[@id="menuForm:mainMenu"]/ul/li[5]/ul/table/tbody/tr/td[4]/ul/li[2]/a'))
     sleep(1)
     print("\n・{} を提出しました🤙\n".format(title))
     MESSAGE += "\n・{} を提出しました🤙\n".format(title)
 
 
 def answer_fb():
+    """
+    LPからFB移動→全て回答する
+    :return: None
+    """
     global MESSAGE
     MESSAGE += '\n\n《フィードバックシート》\n'
     # imgタグ表示まで待機
     wait.until(
         EC.visibility_of_element_located((By.TAG_NAME, 'img')))
-    # アンケート回答
-    webElement = driver.find_element_by_xpath(
-        '//*[@id="menuForm:mainMenu"]/ul/li[5]/ul/table/tbody/tr/td[3]/ul/li[2]/a')
-    driver.execute_script("arguments[0].click();", webElement)
+    # アンケート回答 16番目
+    driver.execute_script("arguments[0].click();", driver.find_elements_by_class_name(
+        'ui-menuitem-text')[16])
     sleep(1)
 
     # アンケート回答一覧
@@ -145,8 +167,7 @@ def answer_fb():
 
                 q1.find_elements_by_class_name('ui-radiobutton')[0].click()
                 q3.find_elements_by_class_name('ui-radiobutton')[1].click()
-                random_select_num = random.randrange(0, 5, 2)
-                q4.find_elements_by_class_name('ui-radiobutton')[random_select_num].click()
+                q4.find_elements_by_class_name('ui-radiobutton')[random.randrange(0, 5, 2)].click()
 
                 fbsubmit(title)
 
@@ -164,6 +185,10 @@ def answer_fb():
 
 
 def check_hw():
+    """
+    宿題部分未確認情報収集処理
+    :return: None
+    """
     any_notice = 0
     global MESSAGE
     MESSAGE += '\n\n《授業関連》\n'
@@ -229,7 +254,7 @@ def check_hw():
                 try:
                     element = content.value_of_css_property('background-size')
                     if element != '80px':
-                        if flag == False:
+                        if not flag:
                             print(class_name)
                             MESSAGE += class_name
                             any_notice += 1
@@ -256,6 +281,10 @@ def fin_action():
 
 
 def send_to_line():
+    """
+    集めた情報をLINE通知
+    :return: None
+    """
     global MESSAGE
     bot.send(
         message=MESSAGE
